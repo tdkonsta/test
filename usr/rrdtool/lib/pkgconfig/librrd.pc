@@ -1,0 +1,10 @@
+prefix=/data/openshift/5335fc54d561c1410e000001/app-root/runtime/build-dependencies/rrdtool
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: librrd
+Description: Library for the RRDtool
+Version: 1.4.8
+Libs: -L${libdir} -lrrd
+Cflags: -I${includedir}
