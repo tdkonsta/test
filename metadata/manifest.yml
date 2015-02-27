@@ -22,7 +22,8 @@ Cart-Data:
 Group-Overrides:
   - components:
     - collectd-5.4.0
-    - web-framwork
+    - php-5.3
+    - web_proxy
     - cron
 Source-Url: https://github.com/tdkonsta/test.git
 Endpoints:
