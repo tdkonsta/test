@@ -9,9 +9,6 @@ Cartridge-Version: 0.0.1
 Cartridge-Vendor: celer
 License: GPL
 Categories:
-  - service
-  - database
-  - embedded
   - plugin
 Website: http://collectd.org
 Provides:
