@@ -1,0 +1,88 @@
+Hostname    "<%=ENV['OPENSHIFT_GEAR_DNS']%>"
+BaseDir "<%=ENV['OPENSHIFT_COLLECTD_DIR']%>collectd/5.4.0/"
+PluginDir "<%=ENV['OPENSHIFT_COLLECTD_DIR']%>collectd/5.4.0/lib/collectd"
+
+LoadPlugin logfile
+TypesDB "<%=ENV['OPENSHIFT_COLLECTD_DIR']%>collectd/5.4.0/share/collectd/types.db"
+TypesDB "<%=ENV['OPENSHIFT_COLLECTD_DIR']%>scripts/types.db"
+
+<Plugin logfile>
+  LogLevel debug
+  File "<%=ENV['OPENSHIFT_COLLECTD_DIR']%>log/collectd.log"
+  Timestamp true
+  PrintSeverity false
+</Plugin>
+
+LoadPlugin exec
+
+<Plugin exec>
+  Exec "<%=ENV['USER']%>" "<%=ENV['OPENSHIFT_COLLECTD_DIR']%>/scripts/openshift.sh"
+</Plugin>
+
+
+
+LoadPlugin processes
+<Plugin "processes">
+  ProcessMatch "/^java/"
+  ProcessMatch "/^node/"
+  ProcessMatch "/^php/"
+  ProcessMatch "/^ruby/"
+  ProcessMatch "/^python/"
+</Plugin>
+
+LoadPlugin load
+<Plugin "load">
+</Plugin>
+
+LoadPlugin memory
+<Plugin "memeory">
+</Plugin>
+
+
+LoadPlugin disk
+<Plugin "disk">
+  Disk "/^sd/"
+  Disk "/^xv/"
+  Disk "/^hd/"
+  IgnoreSelected false
+</Plugin>
+
+LoadPlugin network
+
+<% if ENV['OPENSHIFT_GEAR_DNS']!=ENV['OPENSHIFT_APP_DNS'] %>
+
+<Plugin "network">
+  Server "<%=ENV['OPENSHIFT_COLLECTD_PRIVATE_IP']%>" "<%=ENV['OPENSHIFT_COLLECTD_PRIVATE_PORT']%>"
+</Plugin>
+
+<% else %>
+
+<Plugin "network">
+  Listen "<%=ENV['OPENSHIFT_COLLECTD_PRIVATE_IP']%>" "<%=ENV['OPENSHIFT_COLLECTD_PRIVATE_PORT']%>"
+</Plugin>
+
+
+LoadPlugin rrdtool
+<Plugin "rrdtool">
+  DataDir "<%=ENV['OPENSHIFT_COLLECTD_DIR']%>data"
+  StoreRates true
+</Plugin>
+
+LoadPlugin mysql
+<Plugin "mysql">
+	<% ENV.each do |env| 
+		envvar = env[0].to_s;
+		m=/^DSS_DATASTORE_NAME_(.+)/.match(envvar)
+		m.untaint
+		if m %>
+		<Database "<%=ENV[m[0].untaint]%>">
+		   Host "<%=ENV[('DSS_HOST_'+m[1]).untaint]%>"
+		   User "<%=ENV[('DSS_ADMIN_'+m[1]).untaint ]%>"
+		   Password "<%=ENV[('DSS_PASSWORD_'+m[1]).untaint]%>"
+		   Port "<%=ENV[('DSS_PORT_'+m[1]).untaint]%>"
+		</Database>
+		<% end 
+	end %>
+</Plugin>
+
+<% end %>

@@ -1,0 +1,11 @@
+prefix=/data/openshift/5335fc54d561c1410e000001/app-root/runtime/build-dependencies//glib
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: GThread
+Description: Thread support for GLib
+Requires: glib-2.0
+Version: 2.15.4
+Libs: -L${libdir} -lgthread-2.0 -pthread  -lrt
+Cflags: -pthread

@@ -1,0 +1,48 @@
+---
+Name: collectd
+Cartridge-Short-Name: COLLECTD
+Architecture: x86_64
+Display-Name: collectd 5.4.0
+Description: collectd is a daemon which collects system performance statistics
+Version: '5.4.0'
+Cartridge-Version: 0.0.1
+Cartridge-Vendor: celer
+License: GPL
+Categories:
+  - service
+  - database
+  - embedded
+  - plugin
+Website: http://collectd.org
+Provides:
+  - collectd-5.4.0
+  - collectd
+Scaling:
+  Min: 1
+  Max: -1
+Cart-Data:
+  - Key: OPENSHIFT_COLLECTD_PUBLIC_SERVER_PORT 
+Group-Overrides:
+  - components:
+    - collectd-5.4.0
+    - web_framework
+Source-Url: https://github.com/celer/openshift-collectd.git
+Endpoints:
+  - Private-IP-Name: PRIVATE_IP
+    Private-Port-Name: PRIVATE_PORT
+    Private-Port: 25827
+    Public-Port-Name: PUBLIC_PORT
+  - Private-IP-Name: PRIVATE_HTTP_IP
+    Private-Port-Name: PRIVATE_HTTP_PORT
+    Private-Port: 7873
+    Mappings:
+        - Frontend: "/collectd"
+          Backend: "/"
+          Options: { }
+Subscribes:
+  set-collectd-connection-info:
+    Type: "ENV:NET_TCP:db:collectd:public-port"
+    Required: false
+Publishes:
+  publish-collectd-connection-info:
+    Type: "ENV:NET_TCP:db:collectd:public-port"

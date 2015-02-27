@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Publish stuff $1 $2 $3 $4" >> ~/app-root/data/collectd.log
+
+echo "OPENSHIFT_COLLECTD_SERVER_PUBLIC_PORT=$OPENSHIFT_COLLECTD_PUBLIC_PORT"

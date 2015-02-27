@@ -1,0 +1,112 @@
+#!/bin/bash
+
+GLIB_VERSION="2.15.4"
+
+GLIB_BUILD_DIR="${OPENSHIFT_BUILD_DEPENDENCIES_DIR}/glib-${GLIB_VERSION}"
+GLIB_INSTALL_DIR="${OPENSHIFT_BUILD_DEPENDENCIES_DIR}/glib"
+
+if [ ! -x "$GLIB_INSTALL_DIR" ]
+then
+
+	# Install directory
+	mkdir -p ${OPENSHIFT_BUILD_DEPENDENCIES_DIR}/glib
+
+	# Unpack glib
+	pushd $OPENSHIFT_BUILD_DEPENDENCIES_DIR >/dev/null
+	rm -rf glib-${GLIB_VERSION}* &> /dev/null
+	client_result $(wget http://oss.oetiker.ch/rrdtool/pub/libs/glib-${GLIB_VERSION}.tar.gz)
+	client_result "${GLIB_VERSION} downloaded."
+	tar xzvf glib-${GLIB_VERSION}.tar.gz
+	popd >/dev/null
+
+	# Build glib
+	client_result "Building glib"
+	pushd $GLIB_BUILD_DIR >/dev/null
+	./configure --prefix=$GLIB_INSTALL_DIR
+	make all install
+	popd >/dev/null
+
+	rm -f ${GLIB_BUILD_DIR}.tar.gz
+	rm -rf ${GLIB_BUILD_DIR}
+
+
+	ln -sf $GLIB_INSTALL_DIR $OPENSHIFT_GLIB_DIR/glib/$GLIB_VERSION
+	echo "${GLIB_VERSION} installed successfully."
+
+fi
+
+export PKG_CONFIG_PATH=${GLIB_INSTALL_DIR}/lib/pkgconfig/
+
+RRD_VERSION="1.4.8"
+
+RRD_BUILD_DIR="${OPENSHIFT_BUILD_DEPENDENCIES_DIR}rrdtool-${RRD_VERSION}"
+RRD_INSTALL_DIR="${OPENSHIFT_BUILD_DEPENDENCIES_DIR}rrdtool"
+
+echo $RRD_INSTALL_DIR
+
+if [ ! -x "$RDD_INSTALL_DIR" ]
+then
+	# Install directory
+	mkdir -p ${OPENSHIFT_BUILD_DEPENDENCIES_DIR}/rrdtool
+
+	# Unpack rrdtool
+	pushd $OPENSHIFT_BUILD_DEPENDENCIES_DIR >/dev/null
+	rm -rf rrdtool-${RRD_VERSION}* &> /dev/null
+	client_result $(wget http://oss.oetiker.ch/rrdtool/pub/rrdtool-${RRD_VERSION}.tar.gz)
+	client_result "${RRD_VERSION} downloaded."
+	tar xzvf rrdtool-${RRD_VERSION}.tar.gz
+	popd >/dev/null
+
+	# Build rrdtool
+	client_result "Building rrdtool"
+	pushd $RRD_BUILD_DIR >/dev/null
+	./configure --prefix=$RRD_INSTALL_DIR --disable-perl --disable-lua --disable-ruby --disable-perl  --disable-rrd_graph --disable-rrdcgi
+	make all install
+	popd >/dev/null
+
+	rm -f ${RRD_BUILD_DIR}.tar.gz
+	rm -rf ${RRD_BUILD_DIR}
+
+
+	ln -sf $RRD_INSTALL_DIR $OPENSHIFT_RRD_DIR/rrd/$RRD_VERSION
+	echo "${RRD_VERSION} installed successfully."
+fi
+
+export CFLAGS="-I${OPENSHIFT_BUILD_DEPENDENCIES_DIR}rrdtool/include"
+export LIBS="-lm -lrrd -lrrd_th"
+export LDFLAGS="-L${OPENSHIFT_BUILD_DEPENDENCIES_DIR}rrdtool/lib"
+export LD_LIBRARY_PATH="${OPENSHIFT_BUILD_DEPENDENCIES_DIR}rrdtool/lib:$LD_LIBRARY_PATH"
+
+COLLECTD_VERSION="5.4.0"
+
+COLLECTD_BUILD_DIR="${OPENSHIFT_BUILD_DEPENDENCIES_DIR}/collectd-${COLLECTD_VERSION}"
+COLLECTD_INSTALL_DIR="${OPENSHIFT_BUILD_DEPENDENCIES_DIR}/collectd"
+
+# Install directory
+mkdir -p ${OPENSHIFT_BUILD_DEPENDENCIES_DIR}/collectd
+
+# Unpack collectd
+pushd $OPENSHIFT_BUILD_DEPENDENCIES_DIR >/dev/null
+rm -rf collectd-${COLLECTD_VERSION}* &> /dev/null
+client_result $(wget http://collectd.org/files/collectd-${COLLECTD_VERSION}.tar.bz2)
+client_result "${COLLECTD_VERSION} downloaded."
+tar xjvf collectd-${COLLECTD_VERSION}.tar.bz2
+popd >/dev/null
+
+# Build collectd
+client_result "Building collectd"
+pushd $COLLECTD_BUILD_DIR >/dev/null
+./configure --prefix=$COLLECTD_INSTALL_DIR --enable-all
+make all install
+popd >/dev/null
+
+cp ${COLLECTD_BUILD_DIR}/src/types.db $OPENSHIFT_COLLECTD_DIR/data
+
+rm -f ${COLLECTD_BUILD_DIR}.tar.bz2
+rm -rf ${COLLECTD_BUILD_DIR}
+
+mkdir -p $OPENSHIFT_COLLECTD_DIR/collectd
+mkdir -p $OPENSHIFT_COLLECTD_DIR/data
+
+ln -sf $COLLECTD_INSTALL_DIR $OPENSHIFT_COLLECTD_DIR/collectd/$COLLECTD_VERSION
+echo "${COLLECTD_VERSION} installed successfully."

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Set stuff $1 $2 $3 $4" >> ~/app-root/data/collectd.log
+
