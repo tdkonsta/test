@@ -8,7 +8,6 @@ COLLECTD_PATH=${OPENSHIFT_COLLECTD_DIR}/collectd/5.4.0
 COLLECTD_PID_FILE=$OPENSHIFT_COLLECTD_DIR/run/collectd.pid
 
 COLLECTD_SOCAT_PID_FILE=$OPENSHIFT_COLLECTD_DIR/run/socat.pid
-COLLECTD_PYTHON_PID_FILE=$OPENSHIFT_COLLECTD_DIR/run/python.pid
 
 function start() {
 
@@ -32,18 +31,6 @@ function start() {
     else
       echo "Socat is already running "
     fi
-     
-
-    if [ "$OPENSHIFT_APP_DNS" == "$OPENSHIFT_GEAR_DNS" ]
-    then 
-      # Start the simple python webserver
-      pushd `pwd`
-      cd ${OPENSHIFT_COLLECTD_DIR}/data 
-      python server.py > /dev/null 2>&1 & 
-      echo $! > $COLLECTD_PYTHON_PID_FILE
-      popd
-    fi 
-
     if [ ! -f "${COLLECTD_PID_FILE}" ]
     then
       echo "Starting collectd cartridge"
@@ -66,11 +53,6 @@ function stop() {
       echo "Stopping collectd's socat instance $(cat $COLLECTD_SOCAT_PID_FILE)"
       kill $(cat $COLLECTD_SOCAT_PID_FILE)
       rm -rf "${COLLECTD_SOCAT_PID_FILE}"
-    fi
-    if [ -f "${COLLECTD_PYTHON_PID_FILE}" ]; then
-      echo "Stopping collectd's python instance $(cat $COLLECTD_PYTHON_PID_FILE)"
-      kill $(cat $COLLECTD_PYTHON_PID_FILE)
-      rm -rf "${COLLECTD_PYTHON_PID_FILE}"
     fi
     return 0
 }

@@ -22,7 +22,6 @@ Cart-Data:
 Group-Overrides:
   - components:
     - collectd-5.4.0
-    - web_framework
 Source-Url: https://github.com/tdkonsta/test.git
 Endpoints:
   - Private-IP-Name: PRIVATE_IP
