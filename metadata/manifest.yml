@@ -17,6 +17,7 @@ Provides:
 Scaling:
   Min: 1
   Max: -1
+  Multiplier: 1
 Cart-Data:
   - Key: OPENSHIFT_COLLECTD_PUBLIC_SERVER_PORT 
 Group-Overrides:
